@@ -1,0 +1,40 @@
+# =====================
+# Build / CMake
+# =====================
+/build/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/compile_commands.json
+
+/cpp_trabalho_lp1_api
+
+# =====================
+# Drogon / uploads
+# =====================
+/uploads/
+
+# =====================
+# Logs / temp
+# =====================
+*.log
+*.out
+*.tmp
+*.swp
+*~
+
+# =====================
+# VS Code
+# =====================
+.vscode/*
+!.vscode/settings.json
+!.vscode/c_cpp_properties.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# =====================
+# SO
+# =====================
+.DS_Store
+Thumbs.db

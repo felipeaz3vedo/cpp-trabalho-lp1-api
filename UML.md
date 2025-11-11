@@ -1,14 +1,13 @@
-```mermaid
 classDiagram
-    %% ========= CLASSES DE USUÁRIO =========
-    class User {
-        <<abstract>>
-        +int id
-        +string name
-        +string email
-        +UserType type
-        +double calculateDiscount(orderTotal)
-    }
+%% ========= CLASSES DE USUÁRIO =========
+class User {
+<<abstract>>
++int id
++string name
++string email
++UserType type
++double calculateDiscount(orderTotal)
+}
 
     class Employee {
         +string cpf
@@ -65,6 +64,9 @@ classDiagram
         +bool closed
         +PaymentType paymentType
         +int calculateLoyaltyPoints()
+        %% associações de desconto (XOR):
+        %% +optional<int> customerId
+        %% +optional<int> employeeId
     }
 
     class OrderMenuItem {
@@ -76,12 +78,17 @@ classDiagram
         +double getTotalPrice()
     }
 
+    %% Order / Table / Waiter
     Table "1" -- "0..*" Order : orders
     Employee "1" -- "0..*" Order : waiter
-    User "1" -- "0..*" Order : client
 
-    Order "1" -- "1..*" OrderMenuItem : items
-    MenuItem "1" -- "1..*" OrderMenuItem : items
+    %% Desconto associado a UM tipo de usuário (Customer OU Employee)
+    Customer "1" -- "0..*" Order : discountCustomer
+    Employee "1" -- "0..*" Order : discountEmployee
+
+    %% N:N via OrderMenuItem
+    Order "1" -- "0..*" OrderMenuItem : items
+    MenuItem "1" -- "0..*" OrderMenuItem : items
 
     %% ========= PAYMENT =========
     class PaymentMethod {
@@ -135,4 +142,3 @@ classDiagram
     Employee --> EmployeeRole
     Order --> PaymentType
     PaymentMethod --> PaymentType
-```

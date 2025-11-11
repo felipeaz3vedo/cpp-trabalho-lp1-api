@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
 %% ========= CLASSES DE USUÁRIO =========
 class User {
@@ -142,3 +143,4 @@ class User {
     Employee --> EmployeeRole
     Order --> PaymentType
     PaymentMethod --> PaymentType
+```

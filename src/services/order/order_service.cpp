@@ -55,23 +55,19 @@ namespace {
 
         bool discountApplied = false;
 
-        // 1) tenta como Customer
         try {
             Customer customer = CustomerRepository::findById(userId);
             discount = customer.calculateDiscount(subtotal);
             discountApplied = true;
         } catch (const NotFoundException&) {
-            // não é Customer, tenta Employee
         }
 
-        // 2) se não achou Customer, tenta Employee
         if (!discountApplied) {
             try {
                 Employee employee = EmployeeRepository::findById(userId);
                 discount = employee.calculateDiscount(subtotal);
                 discountApplied = true;
             } catch (const NotFoundException&) {
-                // não achou nem Customer nem Employee -> sem desconto
             }
         }
 

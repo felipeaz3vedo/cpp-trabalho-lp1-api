@@ -120,7 +120,6 @@ void Reservation::validateDateTimes()
         throw ValidationException("Field 'endDateTime' must not be empty.");
     }
 
-    // Aqui assumimos formato ISO (YYYY-MM-DDTHH:MM), então comparação de string funciona.
     if (!(this->startDateTime < this->endDateTime)) {
         throw ValidationException("Field 'startDateTime' must be earlier than 'endDateTime'.");
     }

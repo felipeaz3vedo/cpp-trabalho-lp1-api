@@ -39,13 +39,13 @@ Para rodar manualmente (sem Docker):
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/<seu-usuario>/<seu-repo>.git
+git clone https://github.com/felipeaz3vedo/cpp-trabalho-lp1-api.git
 ```
 
 ### 2. Entrar no diretório do projeto
 
 ```bash
-cd <seu-repo>
+cd cpp-trabalho-lp1-api
 ```
 
 ### 3. Build da imagem

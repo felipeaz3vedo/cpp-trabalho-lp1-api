@@ -14,6 +14,7 @@ struct OrderRequestDto {
     int tableId;
     int waiterId;
     optional<int> customerId;
+    optional<int> employeeId;
     PaymentType paymentType;
     bool closed;
 
@@ -36,16 +37,36 @@ struct OrderRequestDto {
         dto.tableId = json["tableId"].asInt();
         dto.waiterId = json["waiterId"].asInt();
 
-        if (json.isMember("customerId") && json["customerId"].isInt()) {
+        bool hasCustomer = json.isMember("customerId") && json["customerId"].isInt();
+        bool hasEmployee = json.isMember("employeeId") && json["employeeId"].isInt();
+
+        if (hasCustomer && hasEmployee) {
+            throw ValidationException(
+                "Order cannot have both 'customerId' and 'employeeId'. Choose only one."
+            );
+        }
+        if (!hasCustomer && !hasEmployee) {
+            throw ValidationException(
+                "Order must have exactly one of: 'customerId' or 'employeeId'."
+            );
+        }
+
+        if (hasCustomer) {
             dto.customerId = json["customerId"].asInt();
         } else {
             dto.customerId = optional<int>();
         }
 
+        if (hasEmployee) {
+            dto.employeeId = json["employeeId"].asInt();
+        } else {
+            dto.employeeId = optional<int>();
+        }
+
         string paymentTypeStr = json["paymentType"].asString();
         dto.paymentType = PaymentTypeHelper::fromString(paymentTypeStr);
 
-        dto.closed = false;
+        dto.closed = false; // na criação sempre começa aberta
 
         return dto;
     }
@@ -66,19 +87,43 @@ struct OrderRequestDto {
             throw ValidationException("Field 'paymentType' is required and must be a string.");
         }
 
+        if (!json.isMember("closed") || !json["closed"].isBool()) {
+            throw ValidationException("Field 'closed' is required and must be a boolean.");
+        }
+
         dto.tableId = json["tableId"].asInt();
         dto.waiterId = json["waiterId"].asInt();
 
-        if (json.isMember("customerId") && json["customerId"].isInt()) {
+        bool hasCustomer = json.isMember("customerId") && json["customerId"].isInt();
+        bool hasEmployee = json.isMember("employeeId") && json["employeeId"].isInt();
+
+        if (hasCustomer && hasEmployee) {
+            throw ValidationException(
+                "Order cannot have both 'customerId' and 'employeeId'. Choose only one."
+            );
+        }
+        if (!hasCustomer && !hasEmployee) {
+            throw ValidationException(
+                "Order must have exactly one of: 'customerId' or 'employeeId'."
+            );
+        }
+
+        if (hasCustomer) {
             dto.customerId = json["customerId"].asInt();
         } else {
             dto.customerId = optional<int>();
         }
 
+        if (hasEmployee) {
+            dto.employeeId = json["employeeId"].asInt();
+        } else {
+            dto.employeeId = optional<int>();
+        }
+
         string paymentTypeStr = json["paymentType"].asString();
         dto.paymentType = PaymentTypeHelper::fromString(paymentTypeStr);
 
-        dto.closed = json.get("closed", false).asBool();
+        dto.closed = json["closed"].asBool();
 
         return dto;
     }

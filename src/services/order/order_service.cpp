@@ -44,31 +44,38 @@ namespace {
         }
     }
 
+    void validateDiscountAssociation(optional<int> customerId, optional<int> employeeId)
+    {
+        bool hasCustomer = customerId.has_value();
+        bool hasEmployee = employeeId.has_value();
+
+        if (hasCustomer && hasEmployee) {
+            throw BusinessException(
+                "Order cannot be associated with both a customer and an employee."
+            );
+        }
+
+        if (!hasCustomer && !hasEmployee) {
+            throw BusinessException(
+                "Order must be associated with exactly one of: customerId or employeeId."
+            );
+        }
+    }
+
     double calculateUserDiscount(const Order& order, double subtotal)
     {
-        if (!order.hasCustomer()) {
-            return 0.0;
-        }
-
-        int userId = order.getCustomerId().value();
         double discount = 0.0;
 
-        bool discountApplied = false;
-
-        try {
-            Customer customer = CustomerRepository::findById(userId);
+        if (order.hasCustomer()) {
+            int customerId = order.getCustomerId().value();
+            Customer customer = CustomerRepository::findById(customerId);
             discount = customer.calculateDiscount(subtotal);
-            discountApplied = true;
-        } catch (const NotFoundException&) {
-        }
-
-        if (!discountApplied) {
-            try {
-                Employee employee = EmployeeRepository::findById(userId);
-                discount = employee.calculateDiscount(subtotal);
-                discountApplied = true;
-            } catch (const NotFoundException&) {
-            }
+        } else if (order.hasEmployee()) {
+            int employeeId = order.getEmployeeId().value();
+            Employee employee = EmployeeRepository::findById(employeeId);
+            discount = employee.calculateDiscount(subtotal);
+        } else {
+            discount = 0.0;
         }
 
         if (discount < 0.0) {
@@ -117,37 +124,28 @@ Order OrderService::createOrder(
     int tableId,
     int waiterId,
     PaymentType paymentType,
-    optional<int> customerId)
+    optional<int> customerId,
+    optional<int> employeeId)
 {
     TableRepository::findById(tableId);
 
     Employee waiter = EmployeeRepository::findById(waiterId);
     validateWaiterIsValid(waiter);
 
+    validateDiscountAssociation(customerId, employeeId);
+
     if (customerId.has_value()) {
-        int userId = customerId.value();
-
-        bool found = true;
-        try {
-            CustomerRepository::findById(userId);
-        } catch (const NotFoundException&) {
-            try {
-                EmployeeRepository::findById(userId);
-            } catch (const NotFoundException&) {
-                found = false;
-            }
-        }
-
-        if (!found) {
-            throw NotFoundException("Customer/Employee for discount not found.");
-        }
+        CustomerRepository::findById(customerId.value());
+    } else if (employeeId.has_value()) {
+        EmployeeRepository::findById(employeeId.value());
     }
 
     Order order = OrderRepository::createOrder(
         tableId,
         waiterId,
         paymentType,
-        customerId
+        customerId,
+        employeeId
     );
 
     return order;
@@ -169,6 +167,7 @@ Order OrderService::updateOrder(
     int waiterId,
     PaymentType paymentType,
     optional<int> customerId,
+    optional<int> employeeId,
     bool closed)
 {
     Order existing = OrderRepository::findById(id);
@@ -182,24 +181,12 @@ Order OrderService::updateOrder(
     Employee waiter = EmployeeRepository::findById(waiterId);
     validateWaiterIsValid(waiter);
 
+    validateDiscountAssociation(customerId, employeeId);
+
     if (customerId.has_value()) {
-        int userId = customerId.value();
-
-        bool found = true;
-
-        try {
-            CustomerRepository::findById(userId);
-        } catch (const NotFoundException&) {
-            try {
-                EmployeeRepository::findById(userId);
-            } catch (const NotFoundException&) {
-                found = false;
-            }
-        }
-
-        if (!found) {
-            throw NotFoundException("Customer/Employee for discount not found.");
-        }
+        CustomerRepository::findById(customerId.value());
+    } else if (employeeId.has_value()) {
+        EmployeeRepository::findById(employeeId.value());
     }
 
     Order updated = OrderRepository::updateOrder(
@@ -208,6 +195,7 @@ Order OrderService::updateOrder(
         waiterId,
         paymentType,
         customerId,
+        employeeId,
         closed
     );
 
@@ -240,25 +228,32 @@ Order OrderService::closeOrder(int id)
     recalculateTotals(id);
 
     Order updated = OrderRepository::findById(id);
-
     updated.setClosed(true);
+
+    optional<int> customerIdArg;
+    optional<int> employeeIdArg;
+
+    if (updated.hasCustomer()) {
+        customerIdArg = updated.getCustomerId().value();
+    } else if (updated.hasEmployee()) {
+        employeeIdArg = updated.getEmployeeId().value();
+    }
 
     OrderRepository::updateOrder(
         updated.getId(),
         updated.getTableId(),
         updated.getWaiterId(),
         updated.getPaymentType(),
-        updated.hasCustomer()
-            ? optional<int>(updated.getCustomerId().value())
-            : optional<int>(),
+        customerIdArg,
+        employeeIdArg,
         true
     );
 
     if (updated.hasCustomer()) {
-        int userId = updated.getCustomerId().value();
+        int customerId = updated.getCustomerId().value();
 
         try {
-            Customer customer = CustomerRepository::findById(userId);
+            Customer customer = CustomerRepository::findById(customerId);
 
             int points = updated.calculateLoyaltyPoints();
             int newPoints = customer.getLoyaltyPoints() + points;
@@ -314,7 +309,6 @@ OrderMenuItem OrderService::updateOrderItemQtd(
     validateQuantity(quantity);
 
     Order order = OrderRepository::findById(orderId);
-
     validateOrderIsNotClosed(order);
 
     MenuItem menuItem = MenuItemRepository::findById(menuItemId);

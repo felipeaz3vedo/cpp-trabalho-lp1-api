@@ -59,14 +59,14 @@ void Table::validate()
 
 void Table::validateNumber()
 {
-    if (this->number > 0) {
+    if (this->number <= 0) {
         throw ValidationException("Table 'number' must be greater than zero.");
     }
 }
 
 void Table::validateCapacity()
 {
-    if (this->capacity > 0) {
+    if (this->capacity <= 0) {
         throw ValidationException("Table 'capacity' must be greater than zero.");
     }
 

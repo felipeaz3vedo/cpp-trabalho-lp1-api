@@ -15,7 +15,8 @@ public:
         int tableId,
         int waiterId,
         PaymentType paymentType,
-        optional<int> customerId);
+        optional<int> customerId,
+        optional<int> employeeId);
 
     static vector<Order> listOrders();
 
@@ -27,12 +28,12 @@ public:
         int waiterId,
         PaymentType paymentType,
         optional<int> customerId,
+        optional<int> employeeId,
         bool closed);
 
     static void deleteOrder(int id);
 
     static Order closeOrder(int id);
-
 
     static OrderMenuItem addItemToOrder(
         int orderId,

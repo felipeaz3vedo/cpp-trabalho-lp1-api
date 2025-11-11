@@ -54,7 +54,8 @@ void OrderController::createOrder(
             dtoReq.tableId,
             dtoReq.waiterId,
             dtoReq.paymentType,
-            dtoReq.customerId
+            dtoReq.customerId,
+            dtoReq.employeeId
         );
 
         OrderResponseDto dtoResp = OrderResponseDto::fromModel(order);
@@ -101,6 +102,7 @@ void OrderController::updateOrder(
             dtoReq.waiterId,
             dtoReq.paymentType,
             dtoReq.customerId,
+            dtoReq.employeeId,
             dtoReq.closed
         );
 

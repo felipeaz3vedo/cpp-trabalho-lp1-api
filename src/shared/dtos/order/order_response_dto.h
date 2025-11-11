@@ -12,6 +12,7 @@ struct OrderResponseDto {
     int tableId;
     int waiterId;
     optional<int> customerId;
+    optional<int> employeeId;
     PaymentType paymentType;
     double subtotal;
     double discount;
@@ -38,6 +39,12 @@ struct OrderResponseDto {
             dto.customerId = optional<int>();
         }
 
+        if (order.hasEmployee()) {
+            dto.employeeId = order.getEmployeeId().value();
+        } else {
+            dto.employeeId = optional<int>();
+        }
+
         return dto;
     }
 
@@ -58,6 +65,12 @@ struct OrderResponseDto {
             json["customerId"] = this->customerId.value();
         } else {
             json["customerId"] = Json::nullValue;
+        }
+
+        if (this->employeeId.has_value()) {
+            json["employeeId"] = this->employeeId.value();
+        } else {
+            json["employeeId"] = Json::nullValue;
         }
 
         return json;

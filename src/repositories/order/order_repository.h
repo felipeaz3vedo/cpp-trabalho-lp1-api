@@ -14,7 +14,8 @@ public:
         int tableId,
         int waiterId,
         PaymentType paymentType,
-        optional<int> customerId
+        optional<int> customerId,
+        optional<int> employeeId
     );
 
     static vector<Order> findAll();
@@ -27,6 +28,7 @@ public:
         int waiterId,
         PaymentType paymentType,
         optional<int> customerId,
+        optional<int> employeeId,
         bool closed
     );
 

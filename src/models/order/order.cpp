@@ -5,13 +5,15 @@ Order::Order(
     int tableId,
     int waiterId,
     PaymentType paymentType,
-    optional<int> customerId)
+    optional<int> customerId,
+    optional<int> employeeId)
 {
     this->id = id;
     this->tableId = tableId;
     this->waiterId = waiterId;
     this->paymentType = paymentType;
     this->customerId = customerId;
+    this->employeeId = employeeId;
     this->subtotal = 0.0;
     this->discount = 0.0;
     this->fee = 0.0;
@@ -40,11 +42,33 @@ optional<int> Order::getCustomerId() const
 void Order::setCustomerId(int customerId)
 {
     this->customerId = customerId;
+    this->validateAssociation();
 }
 
 void Order::clearCustomer()
 {
     this->customerId.reset();
+}
+
+bool Order::hasEmployee() const
+{
+    return this->employeeId.has_value();
+}
+
+optional<int> Order::getEmployeeId() const
+{
+    return this->employeeId;
+}
+
+void Order::setEmployeeId(int employeeId)
+{
+    this->employeeId = employeeId;
+    this->validateAssociation();
+}
+
+void Order::clearEmployee()
+{
+    this->employeeId.reset();
 }
 
 int Order::getWaiterId() const
@@ -154,6 +178,8 @@ void Order::validateBasic()
     if (this->waiterId <= 0) {
         throw ValidationException("Order 'waiterId' must be greater than zero.");
     }
+
+    this->validateAssociation();
 }
 
 void Order::validateTotals()
@@ -168,5 +194,14 @@ void Order::validateTotals()
 
     if (this->fee < 0.0) {
         this->fee = 0.0;
+    }
+}
+
+void Order::validateAssociation()
+{
+    if (this->customerId.has_value() && this->employeeId.has_value()) {
+        throw ValidationException(
+            "Order cannot be associated with both a customer and an employee for discount."
+        );
     }
 }

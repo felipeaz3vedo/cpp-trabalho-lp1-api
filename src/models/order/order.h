@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <ostream>
 #include "shared/enums/payment_type.h"
 #include "shared/exceptions/validation_exception.h"
 
@@ -13,13 +14,18 @@ public:
         int tableId,
         int waiterId,
         PaymentType paymentType,
-        optional<int> customerId = optional<int>());
+        optional<int> customerId = optional<int>(),
+        optional<int> employeeId = optional<int>());
 
     int getId() const;
     bool hasCustomer() const;
     optional<int> getCustomerId() const;
     void setCustomerId(int customerId);
     void clearCustomer();
+    bool hasEmployee() const;
+    optional<int> getEmployeeId() const;
+    void setEmployeeId(int employeeId);
+    void clearEmployee();
     int getWaiterId() const;
     void setWaiterId(int waiterId);
     int getTableId() const;
@@ -44,6 +50,7 @@ private:
     int tableId;
     int waiterId;
     optional<int> customerId;
+    optional<int> employeeId;
     PaymentType paymentType;
     double subtotal;
     double discount;
@@ -53,4 +60,5 @@ private:
 
     void validateBasic();
     void validateTotals();
+    void validateAssociation();
 };

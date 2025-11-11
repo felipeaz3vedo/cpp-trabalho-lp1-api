@@ -8,14 +8,16 @@ Order OrderRepository::createOrder(
     int tableId,
     int waiterId,
     PaymentType paymentType,
-    optional<int> customerId)
+    optional<int> customerId,
+    optional<int> employeeId)
 {
     Order order(
         nextId,
         tableId,
         waiterId,
         paymentType,
-        customerId
+        customerId,
+        employeeId
     );
 
     orders.push_back(order);
@@ -31,7 +33,7 @@ vector<Order> OrderRepository::findAll()
 
 Order OrderRepository::findById(int id)
 {
-    for (Order order : orders)
+    for (const Order& order : orders)
     {
         if (order.getId() == id)
         {
@@ -48,6 +50,7 @@ Order OrderRepository::updateOrder(
     int waiterId,
     PaymentType paymentType,
     optional<int> customerId,
+    optional<int> employeeId,
     bool closed)
 {
     for (Order& order : orders)
@@ -62,6 +65,12 @@ Order OrderRepository::updateOrder(
                 order.setCustomerId(customerId.value());
             } else {
                 order.clearCustomer();
+            }
+
+            if (employeeId.has_value()) {
+                order.setEmployeeId(employeeId.value());
+            } else {
+                order.clearEmployee();
             }
 
             order.setClosed(closed);
@@ -100,7 +109,7 @@ void OrderRepository::deleteOrder(int id)
     {
         if (orders[i].getId() == id)
         {
-            orders.erase(orders.begin() + (long)i);
+            orders.erase(orders.begin() + static_cast<long>(i));
             return;
         }
     }

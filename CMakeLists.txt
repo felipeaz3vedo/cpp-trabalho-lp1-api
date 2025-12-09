@@ -15,6 +15,7 @@ add_executable(cpp_trabalho_lp1_api
     src/controllers/reservation/reservation_controller.cpp
     src/controllers/menu_item/menu_item_controller.cpp
     src/controllers/order/order_controller.cpp
+    src/controllers/setting/setting_controller.cpp  
 
     # Services
     src/services/user/user_service.cpp
@@ -23,6 +24,8 @@ add_executable(cpp_trabalho_lp1_api
     src/services/menu_item/menu_item_service.cpp
     src/services/order/order_service.cpp
     src/services/payment/payment_service.cpp
+    src/services/setting/setting_service.cpp        
+    src/services/setting/csv_settings_file_parser.cpp       # <- novo
 
     # Repositories
     src/repositories/user/employee_repository.cpp
@@ -32,6 +35,7 @@ add_executable(cpp_trabalho_lp1_api
     src/repositories/menu_item/menu_item_repository.cpp
     src/repositories/order/order_repository.cpp
     src/repositories/order_menu_item/order_menu_item_repository.cpp
+    src/repositories/setting/setting_repository.cpp 
 
     # Models - User
     src/models/user/user.cpp
@@ -55,6 +59,12 @@ add_executable(cpp_trabalho_lp1_api
     src/models/payment/payment_method.cpp
     src/models/payment/card_payment.cpp
     src/models/payment/cash_payment.cpp
+
+    # Models - Setting
+    src/models/setting/setting.cpp
+
+    # DTOs
+    src/shared/dtos/setting/setting_response_dto.cpp
 
     # Helpers
     src/shared/helpers/http_response_helper.cpp

@@ -1,6 +1,6 @@
-```mermaid
 classDiagram
-%% ========= CLASSES DE USUÁRIO =========
+
+%% ===================== USUÁRIOS =====================
 class User {
 <<abstract>>
 +int id
@@ -10,137 +10,158 @@ class User {
 +double calculateDiscount(orderTotal)
 }
 
-    class Employee {
-        +string cpf
-        +EmployeeRole role
-        +bool active
-    }
+class Employee {
++string cpf
++EmployeeRole role
++bool active
+}
 
-    class Customer {
-        +string phone
-        +int loyaltyPoints
-    }
+class Customer {
++string phone
++int loyaltyPoints
+}
 
-    User <|-- Employee
-    User <|-- Customer
+User <|-- Employee
+User <|-- Customer
 
-    %% ========= TABLE & RESERVATION =========
-    class Table {
-        +int id
-        +int number
-        +int capacity
-        +bool available
-    }
+%% ===================== TABLE & RESERVATION =====================
+class Table {
++int id
++int number
++int capacity
++bool available
+}
 
-    class Reservation {
-        +int id
-        +int customerId
-        +int tableId
-        +string startDateTime
-        +string endDateTime
-        +string notes
-        +bool active
-    }
+class Reservation {
++int id
++int customerId
++int tableId
++string startDateTime
++string endDateTime
++string notes
++bool active
+}
 
-    Customer "1" -- "0..*" Reservation : reservations
-    Table "1" -- "0..*" Reservation : reservations
+Customer "1" -- "0.._" Reservation : reservations
+Table "1" -- "0.._" Reservation : reservations
 
-    %% ========= MENU & ORDER =========
-    class MenuItem {
-        +int id
-        +string name
-        +string description
-        +double price
-        +bool active
-    }
+%% ===================== CATEGORY (NOVA) =====================
+class Category {
++int id
++string name
++string description
++bool active
+}
 
-    class Order {
-        +int id
-        +int tableId
-        +int waiterId
-        +double subtotal
-        +double discount
-        +double fee
-        +double total
-        +bool closed
-        +PaymentType paymentType
-        +int calculateLoyaltyPoints()
-        %% associações de desconto (XOR):
-        %% +optional<int> customerId
-        %% +optional<int> employeeId
-    }
+%% ===================== MENU & ORDER =====================
+class MenuItem {
++int id
++string name
++string description
++double price
++bool active
++int categoryId
+}
 
-    class OrderMenuItem {
-        +int id
-        +int orderId
-        +int menuItemId
-        +int quantity
-        +double unitPrice
-        +double getTotalPrice()
-    }
+MenuItem --> Category : belongsTo
 
-    %% Order / Table / Waiter
-    Table "1" -- "0..*" Order : orders
-    Employee "1" -- "0..*" Order : waiter
+class Order {
++int id
++int tableId
++int waiterId
++double subtotal
++double discount
++double fee
++double total
++bool closed
++PaymentType paymentType
++int calculateLoyaltyPoints()
+}
 
-    %% Desconto associado a UM tipo de usuário (Customer OU Employee)
-    Customer "1" -- "0..*" Order : discountCustomer
-    Employee "1" -- "0..*" Order : discountEmployee
+class OrderMenuItem {
++int id
++int orderId
++int menuItemId
++int quantity
++double unitPrice
++double getTotalPrice()
+}
 
-    %% N:N via OrderMenuItem
-    Order "1" -- "0..*" OrderMenuItem : items
-    MenuItem "1" -- "0..*" OrderMenuItem : items
+Table "1" -- "0.._" Order : orders
+Employee "1" -- "0.._" Order : waiter
 
-    %% ========= PAYMENT =========
-    class PaymentMethod {
-        <<abstract>>
-        +PaymentType type
-        +string getMethodName()
-        +double calculateFee(amount)
-    }
+Customer "1" -- "0.._" Order : discountCustomer
+Employee "1" -- "0.._" Order : discountEmployee
 
-    class CashPayment {
-        +string getMethodName()
-        +double calculateFee(amount)
-    }
+Order "1" -- "0.._" OrderMenuItem : items
+MenuItem "1" -- "0.._" OrderMenuItem : items
 
-    class CardPayment {
-        +string cardBrand
-        +string last4Digits
-        +double percentageFee
-        +double fixedFee
-        +string getMethodName()
-        +double calculateFee(amount)
-    }
+%% ===================== PAYMENT =====================
+class PaymentMethod {
+<<abstract>>
++PaymentType type
++string getMethodName()
++double calculateFee(amount)
+}
 
-    PaymentMethod <|-- CashPayment
-    PaymentMethod <|-- CardPayment
+class CashPayment {
++string getMethodName()
++double calculateFee(amount)
+}
 
-    Order ..> PaymentMethod : calcula fee
+class CardPayment {
++string cardBrand
++string last4Digits
++double percentageFee
++double fixedFee
++string getMethodName()
++double calculateFee(amount)
+}
 
-    %% ========= ENUMS =========
-    class EmployeeRole {
-        <<enumeration>>
-        CASHIER
-        COOK
-        MANAGER
-        WAITER
-    }
+PaymentMethod <|-- CashPayment
+PaymentMethod <|-- CardPayment
+Order ..> PaymentMethod : calcula fee
 
-    class PaymentType {
-        <<enumeration>>
-        CASH
-        CARD
-    }
+%% ===================== SETTINGS (NOVA) =====================
+class Setting {
++string key
++string valueString
++double valueNumber
++bool valueBool
++SettingValueType valueType
+}
 
-    class UserType {
-        <<enumeration>>
-        EMPLOYEE
-        CUSTOMER
-    }
+class SettingValueType {
+<<enumeration>>
+STRING
+NUMBER
+BOOLEAN
+}
 
-    User --> UserType
-    Employee --> EmployeeRole
-    Order --> PaymentType
-    PaymentMethod --> PaymentType
-```
+Setting --> SettingValueType
+
+%% ===================== ENUMERAÇÕES =====================
+class EmployeeRole {
+<<enumeration>>
+CASHIER
+COOK
+MANAGER
+WAITER
+}
+
+class PaymentType {
+<<enumeration>>
+CASH
+CARD
+}
+
+class UserType {
+<<enumeration>>
+EMPLOYEE
+CUSTOMER
+}
+
+User --> UserType
+Employee --> EmployeeRole
+Order --> PaymentType
+PaymentMethod --> PaymentType

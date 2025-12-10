@@ -13,11 +13,11 @@ public:
         string name,
         string description,
         double price,
-        bool active = true
-    );
+        bool active,
+        int categoryId);
 
     static vector<MenuItem> listMenuItems();
-
+    
     static MenuItem getMenuItemById(int id);
 
     static MenuItem updateMenuItem(
@@ -25,8 +25,9 @@ public:
         string name,
         string description,
         double price,
-        bool active
-    );
+        bool active,
+        int categoryId);
 
     static void deleteMenuItem(int id);
 };
+

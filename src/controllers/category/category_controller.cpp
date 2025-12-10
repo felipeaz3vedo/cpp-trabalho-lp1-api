@@ -1,9 +1,9 @@
-#include "controllers/menu_item/menu_item_controller.h"
-#include "services/menu_item/menu_item_service.h"
+#include "controllers/category/category_controller.h"
+#include "services/category/category_service.h"
+#include "shared/dtos/category/category_request_dto.h"
+#include "shared/dtos/category/category_response_dto.h"
 #include "shared/helpers/http_response_helper.h"
 #include "shared/exceptions/bad_request_exception.h"
-#include "shared/dtos/menu_item/menu_item_request_dto.h"
-#include "shared/dtos/menu_item/menu_item_response_dto.h"
 
 #include <json/json.h>
 #include <vector>
@@ -12,19 +12,18 @@ using drogon::HttpRequestPtr;
 using drogon::HttpResponsePtr;
 using HttpHelper::handleRequest;
 using std::vector;
-using std::string;
 
-void MenuItemController::listMenuItems(
+void CategoryController::listCategories(
     const HttpRequestPtr&,
     std::function<void(const HttpResponsePtr&)>&& cb)
 {
     handleRequest(cb, [&]() {
-        vector<MenuItem> items = MenuItemService::listMenuItems();
+        vector<Category> categories = CategoryService::listCategories();
 
         Json::Value body(Json::arrayValue);
-        for (const MenuItem& item : items)
+        for (const Category& category : categories)
         {
-            MenuItemResponseDto dto = MenuItemResponseDto::fromModel(item);
+            CategoryResponseDto dto = CategoryResponseDto::fromModel(category);
             body.append(dto.toJson());
         }
 
@@ -33,7 +32,7 @@ void MenuItemController::listMenuItems(
     });
 }
 
-void MenuItemController::createMenuItem(
+void CategoryController::createCategory(
     const HttpRequestPtr& req,
     std::function<void(const HttpResponsePtr&)>&& cb)
 {
@@ -44,40 +43,39 @@ void MenuItemController::createMenuItem(
             throw BadRequestException("Invalid JSON body.");
         }
 
-        MenuItemRequestDto dtoReq = MenuItemRequestDto::fromJson(*json);
+        CategoryRequestDto dtoReq = CategoryRequestDto::fromJson(*json);
 
-        MenuItem item = MenuItemService::createMenuItem(
+        Category category = CategoryService::createCategory(
             dtoReq.name,
             dtoReq.description,
-            dtoReq.price,
-            dtoReq.active,
-            dtoReq.categoryId
-        );
+            dtoReq.active);
 
-        MenuItemResponseDto dtoResp = MenuItemResponseDto::fromModel(item);
+        CategoryResponseDto dtoResp = CategoryResponseDto::fromModel(category);
+        Json::Value body = dtoResp.toJson();
 
-        HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(dtoResp.toJson());
+        HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(body);
         resp->setStatusCode(drogon::k201Created);
         cb(resp);
     });
 }
 
-void MenuItemController::getMenuItem(
+void CategoryController::getCategory(
     const HttpRequestPtr&,
     std::function<void(const HttpResponsePtr&)>&& cb,
     int id)
 {
     handleRequest(cb, [&]() {
-        MenuItem item = MenuItemService::getMenuItemById(id);
+        Category category = CategoryService::getCategoryById(id);
 
-        MenuItemResponseDto dto = MenuItemResponseDto::fromModel(item);
+        CategoryResponseDto dto = CategoryResponseDto::fromModel(category);
+        Json::Value body = dto.toJson();
 
-        HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(dto.toJson());
+        HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(body);
         cb(resp);
     });
 }
 
-void MenuItemController::updateMenuItem(
+void CategoryController::updateCategory(
     const HttpRequestPtr& req,
     std::function<void(const HttpResponsePtr&)>&& cb,
     int id)
@@ -89,31 +87,29 @@ void MenuItemController::updateMenuItem(
             throw BadRequestException("Invalid JSON body.");
         }
 
-        MenuItemRequestDto dtoReq = MenuItemRequestDto::fromJson(*json);
+        CategoryRequestDto dtoReq = CategoryRequestDto::fromJson(*json);
 
-        MenuItem item = MenuItemService::updateMenuItem(
+        Category category = CategoryService::updateCategory(
             id,
             dtoReq.name,
             dtoReq.description,
-            dtoReq.price,
-            dtoReq.active,
-            dtoReq.categoryId
-        );
+            dtoReq.active);
 
-        MenuItemResponseDto dtoResp = MenuItemResponseDto::fromModel(item);
+        CategoryResponseDto dtoResp = CategoryResponseDto::fromModel(category);
+        Json::Value body = dtoResp.toJson();
 
-        HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(dtoResp.toJson());
+        HttpResponsePtr resp = drogon::HttpResponse::newHttpJsonResponse(body);
         cb(resp);
     });
 }
 
-void MenuItemController::deleteMenuItem(
+void CategoryController::deleteCategory(
     const HttpRequestPtr&,
     std::function<void(const HttpResponsePtr&)>&& cb,
     int id)
 {
     handleRequest(cb, [&]() {
-        MenuItemService::deleteMenuItem(id);
+        CategoryService::deleteCategory(id);
 
         HttpResponsePtr resp = drogon::HttpResponse::newHttpResponse();
         resp->setStatusCode(drogon::k204NoContent);

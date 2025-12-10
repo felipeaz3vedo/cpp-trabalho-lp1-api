@@ -1,21 +1,23 @@
 #include "repositories/menu_item/menu_item_repository.h"
 #include "shared/exceptions/not_found_exception.h"
 
-std::vector<MenuItem> MenuItemRepository::menuItems = {};
+vector<MenuItem> MenuItemRepository::menuItems = {};
 int MenuItemRepository::nextId = 1;
 
 MenuItem MenuItemRepository::createMenuItem(
     string name,
     string description,
     double price,
-    bool active)
+    bool active,
+    int categoryId)
 {
     MenuItem item(
         nextId,
         name,
         description,
         price,
-        active
+        active,
+        categoryId
     );
 
     menuItems.push_back(item);
@@ -24,14 +26,14 @@ MenuItem MenuItemRepository::createMenuItem(
     return item;
 }
 
-std::vector<MenuItem> MenuItemRepository::findAll()
+vector<MenuItem> MenuItemRepository::findAll()
 {
     return menuItems;
 }
 
 MenuItem MenuItemRepository::findById(int id)
 {
-    for (MenuItem item : menuItems)
+    for (const MenuItem& item : menuItems)
     {
         if (item.getId() == id)
         {
@@ -47,7 +49,8 @@ MenuItem MenuItemRepository::updateMenuItem(
     string name,
     string description,
     double price,
-    bool active)
+    bool active,
+    int categoryId)
 {
     for (MenuItem& item : menuItems)
     {
@@ -57,6 +60,7 @@ MenuItem MenuItemRepository::updateMenuItem(
             item.setDescription(description);
             item.setPrice(price);
             item.setActive(active);
+            item.setCategoryId(categoryId);  // 👈 atualiza a categoria também
 
             return item;
         }

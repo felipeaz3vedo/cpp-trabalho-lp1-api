@@ -5,15 +5,16 @@
 
 using std::string;
 
-class MenuItem {
+class MenuItem
+{
 public:
     MenuItem(
         int id,
         string name,
         string description,
         double price,
-        bool active = true
-    );
+        bool active = true,
+        int categoryId = 0);
 
     int getId() const;
 
@@ -25,6 +26,8 @@ public:
     void setPrice(double price);
     bool isActive() const;
     void setActive(bool active);
+    int getCategoryId() const;
+    void setCategoryId(int categoryId);
 
 private:
     int id;
@@ -32,8 +35,10 @@ private:
     string description;
     double price;
     bool active;
+    int categoryId;
 
     void validate();
     void validateName();
     void validatePrice();
+    void validateCategoryId();
 };

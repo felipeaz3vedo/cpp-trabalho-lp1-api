@@ -1,4 +1,5 @@
 #include "services/menu_item/menu_item_service.h"
+#include "services/category/category_service.h"
 #include "repositories/menu_item/menu_item_repository.h"
 #include "repositories/order/order_repository.h"
 #include "repositories/order_menu_item/order_menu_item_repository.h"
@@ -46,13 +47,18 @@ MenuItem MenuItemService::createMenuItem(
     string name,
     string description,
     double price,
-    bool active)
+    bool active,
+    int categoryId)
 {
+
+    CategoryService::getCategoryById(categoryId);
+
     return MenuItemRepository::createMenuItem(
         name,
         description,
         price,
-        active
+        active,
+        categoryId
     );
 }
 
@@ -71,15 +77,19 @@ MenuItem MenuItemService::updateMenuItem(
     string name,
     string description,
     double price,
-    bool active)
+    bool active,
+    int categoryId)
 {
+    CategoryService::getCategoryById(categoryId);
+
     return MenuItemRepository::updateMenuItem(
-        id,
+        id, 
         name,
         description,
-        price,
-        active
-    );}
+        price, 
+        active, 
+        categoryId);
+}
 
 void MenuItemService::deleteMenuItem(int id)
 {
